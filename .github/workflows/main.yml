@@ -1,0 +1,22 @@
+name: Evercode checks
+
+on:
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Select Xcode
+        run: sudo xcode-select -switch /Applications/Xcode_14.1.app && /usr/bin/xcodebuild -version
+
+      - name: Download test file
+        run: curl -0 https://devpass-api-bucket.s3.amazonaws.com/testes/GettingStartedWithMVVMIosTests/MainViewModelTests.swift -o EvercodeAppTests/MainViewModelTests.swift
+
+      - name: Run Unit Tests
+        run: xcodebuild test -scheme EvercodeApp -project EvercodeApp.xcodeproj -destination 'platform=iOS Simulator,name=iPhone 14 Pro,OS=16.1' | xcpretty && exit ${PIPESTATUS[0]}
